@@ -13,7 +13,9 @@ RUN apt-get install -y python python-dev python-distribute python-pip nodejs npm
 
 RUN apt-get install -y tesseract-ocr
 
-RUN npm install node-tesseract
+RUN npm install -g node-tesseract
+
+RUN npm install -g grunt-cli
 
 ADD . /benedetto
 
