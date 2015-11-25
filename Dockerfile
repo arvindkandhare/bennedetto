@@ -17,12 +17,12 @@ RUN npm install node-tesseract
 
 ADD . /benedetto
 
+WORKDIR /benedetto
+
 RUN make dev-bootstrap
 
 
 EXPOSE 8000
-
-WORKDIR /benedetto
 
 CMD make run
 
