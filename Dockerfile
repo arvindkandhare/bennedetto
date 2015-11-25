@@ -11,6 +11,8 @@ RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential
 # Install Python and Basic Python Tools
 RUN apt-get install -y python python-dev python-distribute python-pip nodejs npm
 
+RUN apt-get install -y nodejs-legacy
+
 RUN apt-get install -y tesseract-ocr
 
 RUN npm install -g node-tesseract
