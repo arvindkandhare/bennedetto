@@ -1,5 +1,6 @@
 <form name="transForm"
       ng-submit="transFormCtrl.submit() ; transFormCtrl.reset(transForm);"
+      md-autofocus
       novalidate>
   <div class="form-group">
     <md-input-container>
@@ -33,5 +34,5 @@
       <p ng-message="required">Timestamp is required</p>
     </div>
   </div>
-  <button class="btn btn-default" ng-disabled="transForm.$invalid">Save</button>
+  <md-button class="md-primary md-raised" ng-disabled="transForm.$invalid">Save</button>
 </form>

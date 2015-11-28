@@ -10,10 +10,11 @@ from bennedetto.utils import display_money
 
 
 class TotalByMixin(object):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         if not getattr(self, 'total_by', None):
             raise AttributeError('TotalByMixin requires a'
                                  '"total_by" property on the model')
+        super(TotalByMixin, self).__init__()
 
     def total(self):
         expr = models.Sum(self.total_by)
@@ -21,7 +22,14 @@ class TotalByMixin(object):
         return self.aggregate(expr)[key] or 0
 
 
-class RateQuerySet(models.QuerySet, TotalByMixin):
+class UserMixin(object):
+    user_by = 'user'
+
+    def user(self, user):
+        return self.filter((self.user_by, user))
+
+
+class RateQuerySet(models.QuerySet, TotalByMixin, UserMixin):
     total_by = 'amount_per_day'
 
 
@@ -51,8 +59,13 @@ class Rate(models.Model):
                                   display_money(self.amount_per_day))
 
 
-class TransactionQuerySet(models.QuerySet, TotalByMixin):
+class TransactionQuerySet(models.QuerySet, TotalByMixin, UserMixin):
     total_by = 'amount'
+
+    def date(self, date):
+        return self.filter(timestamp__month=date.month,
+                           timestamp__day=date.day,
+                           timestamp__year=date.year)
 
     def create_from_rate_balance(self, user):
         instance = self.model()
@@ -61,9 +74,9 @@ class TransactionQuerySet(models.QuerySet, TotalByMixin):
         instance.user = user
         return instance
 
-    def bulk_transact_rate_total(self, users):  # TODO: need a nice test case
-        return self.bulk_create([self.create_from_rate_balance(user)  # for this
-                                 for user in users])  # It's really important
+    def bulk_transact_rate_total(self, users):
+        return self.bulk_create([self.create_from_rate_balance(user)
+                                 for user in users])
 
 
 class Transaction(models.Model):

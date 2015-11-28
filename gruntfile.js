@@ -49,8 +49,55 @@ module.exports = function(grunt) {
                         'node_modules/angular-ui-bootstrap/ui-bootstrap-csp.css',
                         'node_modules/angular-material/angular-material.min.css',
                         'node_modules/angular-material/angular-material.layout.min.css',
-                        'node_modules/angular-material-data-table/dist/md-data-table.min.css'
+                        'node_modules/angular-material-data-table/dist/md-data-table.min.css',
+                        'node_modules/font-awesome/css/font-awesome.min.css'
                     ]
+                }
+            }
+        },
+        copy: {
+            files: {
+                cwd: 'node_modules/font-awesome/fonts',
+                src: '**/*',
+                dest: 'static/fonts',
+                expand: true
+            }
+        },
+        "regex-replace": {
+            css: {
+                src: ['static/vendor.min.css'],
+                actions: [
+                    {
+                        name: 'font',
+                        search: '../fonts/',
+                        replace: '/static/fonts/',
+                        flags: 'g'
+                    }
+                ]
+            }
+        },
+        jasmine: {
+            pivotal: {
+                src: [
+                    'static/app/**/*.js',
+                    'jasmine/mocks.js',
+                ],
+                options: {
+                    specs: 'jasmine/**/*.js',
+                    vendor: [
+                        'static/vendor-debug.js',
+                        'node_modules/angular-mocks/angular-mocks.js'
+                    ],
+                    polyfills: 'static/js/polyfills.js',
+                    keepRunner: true
+                }
+            }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 8888,
+                    keepalive: true
                 }
             }
         }
@@ -58,6 +105,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.registerTask('default', ['browserify', 'cssmin', 'jshint']);
-    grunt.registerTask('test', ['jshint']);
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-regex-replace');
+    grunt.loadNpmTasks('grunt-contrib-jasmine');
+    grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.registerTask('default', ['browserify', 'cssmin', 'copy', 'regex-replace', 'jshint', 'jasmine']);
+    grunt.registerTask('test', ['jshint', 'jasmine']);
 };

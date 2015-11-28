@@ -1,32 +1,26 @@
-FROM ubuntu:latest
+FROM django
 
-MAINTAINER ARvind Kandhare
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
-# apt is up to date
-RUN apt-get update
+RUN apt-get update && apt-get install -y \
+    bzip2 \
+    fontconfig \
+    libfreetype6-dev \
+    nodejs npm \
+  --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-# Basic tools
-RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential
+COPY requirements /usr/src/app/requirements
+RUN pip install --no-cache-dir -r requirements/dev.txt
 
-# Install Python and Basic Python Tools
-RUN apt-get install -y python python-dev python-distribute python-pip nodejs npm
+COPY . /usr/src/app
 
-RUN apt-get install -y nodejs-legacy
+RUN ln -s /usr/bin/nodejs /usr/bin/node && \
+    npm install && \
+    npm install -g grunt-cli && \
+    grunt
 
-RUN apt-get install -y tesseract-ocr
-
-RUN npm install -g node-tesseract
-
-RUN npm install -g grunt-cli
-
-ADD . /benedetto
-
-WORKDIR /benedetto
-
-RUN make dev-bootstrap
-
+RUN python manage.py migrate
 
 EXPOSE 8000
-
-CMD make run
-
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

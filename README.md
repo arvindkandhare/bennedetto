@@ -1,5 +1,7 @@
 # bennedetto
 
+[![Join the chat at https://gitter.im/arecker/bennedetto](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/arecker/bennedetto?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 The simple, turn-based budget.
 
 [![Build Status](https://travis-ci.org/arecker/bennedetto.svg)](https://travis-ci.org/arecker/bennedetto)
@@ -31,6 +33,18 @@ This will install local dependencies, perform local database migrations, and pro
 To start the webserver, run the familiar `python manage.py runserver` or use the alias provided in the Makefile
 
     $ make run
+
+### Running inside Docker
+
+To build the Docker image use
+
+    $ docker build -t bennedetto .
+
+After that you may run it thus:
+
+    $ docker run -p 8000:8000 bennedetto
+
+You can see the app now at http://localhost:8000
 
 ## Testing
 

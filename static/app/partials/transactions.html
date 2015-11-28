@@ -1,16 +1,16 @@
-<div class="row">
-  <div class="col-md-4">
-    <md-card>
-      <md-card-content>
-        <bd-transactions-form after-submit="ctrl.reloadHandle"></bd-transactions-form>
-      </md-card-content>
-    </md-card>
+<section layout="row" flex>
+  <md-content flex layout-padding>
+    <div class="page-header">
+      <h2 class="lead">Transactions</h2>
     </div>
-  <div class="col-md-8">
-    <md-card>
-      <md-card-content>
-        <bd-transactions-list reload-handle="ctrl.reloadHandle"></bd-transactions-list>
-      </md-card-content>
-    </md-card>
-  </div>
-</div>
+    <div class="row">
+      <div class="col-md-6">
+        <button class="btn btn-success" ng-click="ctrl.toggleRight()"><i class="fa fa-plus"></i> Add</button>
+        <bd-transactions-list reload-handle="ctrl.reloadHandle" edit="ctrl.edit"></bd-transactions-list>
+      </div>
+    </div>
+  </md-content>
+  <bd-sliding-sidebar>
+    <bd-transactions-form after-submit="ctrl.afterSubmit" edit="ctrl.sendToEdit"></bd-transactions-form>
+  </bd-sliding-sidebar>
+</section>

@@ -1,5 +1,4 @@
 import os
-import subprocess
 
 THIS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.join(THIS_DIR, '..')
@@ -19,10 +18,12 @@ INSTALLED_APPS = (
     # 3rd party apps
     'compressor',
     'rest_framework',
+    'timezone_field',
 
     # Project apps
     'authenticating',
-    'tracking'
+    'tracking',
+    'reporting'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -84,10 +85,22 @@ REST_FRAMEWORK = {
 }
 
 try:
-    VERSION = (subprocess.Popen(['git', 'describe'],
-                                stdout=subprocess.PIPE)
-               .communicate()[0]
-               .rstrip('\n'))
-except:
+    suffix = ''
+    version = '0.0'
+
+    with open(os.path.join(BASE_DIR, 'CHANGELOG.md')) as f:
+        import re
+
+        reUnreleased = re.compile('^## Unreleased$')
+        reVersion = re.compile('^## ([0-9].*) -')
+
+        for line in f:
+            if reUnreleased.match(line):
+                suffix = '-Unreleased'
+            m = reVersion.match(line)
+            if m:
+                version = m.group(1)
+    VERSION = 'v%s%s' % (version, suffix)
+except Exception as e:
+    print('Could not determine version')
     VERSION = 'v0.0'
-    print('Could not determine git version')
