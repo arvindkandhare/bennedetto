@@ -1,5 +1,6 @@
 from uuid import uuid4
 from decimal import Decimal
+import datetime
 
 from django.db import models
 from django.core.validators import MinValueValidator
@@ -61,10 +62,43 @@ class Rate(models.Model):
 class TransactionQuerySet(models.QuerySet, TotalByMixin, UserMixin):
     total_by = 'amount'
 
+    def _days_from_today(self, days):
+        end = timezone.now()
+        start = end - datetime.timedelta(days=days)
+        return self.date_range(start, end)
+
     def date(self, date):
         return self.filter(timestamp__month=date.month,
                            timestamp__day=date.day,
                            timestamp__year=date.year)
+
+    def today(self):
+        return self.date(timezone.now())
+
+    def last_week(self):
+        return self._days_from_today(7)
+
+    def last_month(self):
+        return self._days_from_today(30)
+
+    def last_year(self):
+        return self._days_from_today(365)
+
+    def date_range(self, start, end):
+        qs = self
+        zone = timezone.get_current_timezone()
+
+        if start:
+            start = datetime.datetime.combine(start, datetime.time.min)
+            start = zone.localize(start)
+            qs = qs.filter(timestamp__gte=start)
+
+        if end:
+            end = datetime.datetime.combine(end, datetime.time.max)
+            end = zone.localize(end)
+            qs = qs.filter(timestamp__lte=end)
+
+        return qs
 
     def create_from_rate_balance(self, user):
         instance = self.model()

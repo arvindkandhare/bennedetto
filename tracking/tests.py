@@ -1,7 +1,9 @@
 from decimal import Decimal
 from collections import namedtuple
+import datetime
 
 from django.test import TestCase
+from django.utils import timezone
 
 from authenticating.models import User
 from tracking.models import (Rate,
@@ -91,6 +93,42 @@ class TransactionTestCase(TestCase):
 
         actual = Transaction.objects.total()
         self.assertEqual(actual, to_decimal(5))
+
+    def test_date_filter(self):
+        mock = Transaction()
+        mock.amount = Decimal(10)
+        mock.description = 'Date Test'
+        mock.user = User.objects.create_user('hello@test.com')
+        mock.user.activate_timezone()
+        mock.timestamp = datetime.datetime(2014, 1, 1, 8, 15, 2, 0, timezone.get_current_timezone())
+        mock.save()
+
+        filter_date = datetime.datetime.combine(datetime.datetime(2014, 1, 1),
+                                                datetime.time.max)
+        actual = Transaction.objects.date(filter_date).first()
+        self.assertEqual(actual.description, 'Date Test')
+
+        filter_date = datetime.datetime(2014, 1, 2, 8, 15, 2, 0, timezone.get_current_timezone())
+        actual = Transaction.objects.date(filter_date).exists()
+        self.assertFalse(actual)
+
+    def test_date_range_filter(self):
+        mock = Transaction()
+        mock.amount = Decimal(10)
+        mock.description = 'Date Range Test'
+        mock.user = User.objects.create_user('hello@test.com')
+        mock.user.activate_timezone()
+        mock.timestamp = datetime.datetime(2014, 1, 1, 8, 15, 2, 0, timezone.get_current_timezone())
+        mock.save()
+
+        start = datetime.datetime(2013, 12, 31, 5, 5, 5, 5,  timezone.get_current_timezone())
+        end = datetime.datetime(2014, 1, 1, 0, 0, 0, 0, timezone.get_current_timezone())
+        actual = Transaction.objects.date_range(start, end).first()
+        self.assertEqual(actual.description, 'Date Range Test')
+
+        end = datetime.datetime(2013, 12, 31, 12, 12, 12, 12, timezone.get_current_timezone())
+        actual = Transaction.objects.date_range(start, end).exists()
+        self.assertFalse(actual)
 
 
 class TotalByMixinTestCase(TestCase):
