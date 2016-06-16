@@ -23,12 +23,17 @@ To build the project, create a new virtual environment and activate it.
     $ virtualenv --no-site-packages ~/.virtualenvs/bennedetto
     $ source ~/.virtualenvs/bennedetto/bin/activate
 
-Next, navigate to the source root and run the bootstrap command.
+Next, navigate to the source root, install the dev dependencies, and
+run the migrations.
 
     $ cd ~/git/bennedetto
-    $ make dev-bootstrap
+    $ make install-dev
+    $ make migrate
 
-This will install local dependencies, perform local database migrations, and prompt you to create a superuser.
+Now create a superuser that will have access to both the django admin
+and the app itself.
+
+    $ make superuser
 
 To start the webserver, run the familiar `python manage.py runserver` or use the alias provided in the Makefile
 
@@ -46,19 +51,54 @@ After that you may run it thus:
 
 You can see the app now at http://localhost:8000
 
+### Compiling JavaScript
+
+Rollups of the vendor scripts and stylesheets are available for those
+who aren't interested in clientside code, but if you _do_ wish to hack
+the frontend, you will need to install some extra dependencies.
+
+First, ensure `node` and `nodejs-legacy` are installed for your
+distribution.
+
+Next, globally install the grunt package.
+
+    $ sudo npm install -g grunt-cli
+
+Lastly, install the project npm dependencies
+
+    $ npm install
+
+You should now be able to recompile the static resources with the
+command `grunt build`.
+
+## Running
+
+Once your create a superuser as described in the build steps, you have
+access to the site as well as the admin page.
+
+You can also register inferior users by more natural means by the
+"register" link on the login page.
+
+To automatically calculate rates and "open" each day, setup an hourly
+cronjob to trigger the `transact` job.  It should look something like
+this.
+
+    0 * * * * /path/to/python /path/to/bennedetto/manage.py transact
+
+The job is intended to run hourly to account for different timezones.
+The app should open up each user's day precisely at _their_ midnight.
+
 ## Testing
 
 To run the serverside tests
 
-    $ python manage.py test
+    $ make test
+
+Alternatively, you may install `tox` and run them that way.
 
 To run the clientside tests
 
     $ grunt test
-
-To run everything
-
-    $ make test
 
 ## Standards
 

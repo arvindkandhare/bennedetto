@@ -17,13 +17,25 @@
                 controller: 'ExploreController',
                 controllerAs: 'ctrl'
             })
+            .when('/profile', {
+                templateUrl: '{}app/partials/profile.html'.format(APP_SETTINGS.staticUrl),
+                controller: 'ProfileController',
+                controllerAs: 'ctrl',
+                resolve: {
+                    user: function(UserResourceFactory) {
+                        return UserResourceFactory.buildUserProfile().then(function(d) {
+                            return d.data;
+                        });
+                    }
+                }
+            })
             .otherwise({
                 redirectTo: '/track'
             });
     }
 
     angular
-        .module('bennedetto', ['ngRoute', 'ngResource', 'ngMessages', 'ngMaterial'])
+        .module('bennedetto', ['ngRoute', 'ngResource', 'ngMessages', 'ngMaterial', 'chart.js'])
         .config(['$routeProvider', '$resourceProvider', '$httpProvider', 'APP_SETTINGS', config]);
 
 }());

@@ -1,11 +1,31 @@
-<md-toolbar layout="row">
+<md-toolbar id="sitebar" layout="row">
   <div class="md-toolbar-tools">
     <md-button ng-click="navCtrl.toggleSideNav('left')" hide-gt-sm class="md-icon-button">
       <md-icon aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg">
       </md-icon>
     </md-button>
-    <h1 class="lead">bennedetto <small ng-bind="navCtrl.version"></small></h1>
+    <h1 class="lead"> <img src="/static/images/bennedetto.png" alt="" height="75px" /> </h1>
   </div>
+  <span flex></span>
+  <md-menu md-position-mode="target-right target">
+    <md-button class="fab md-mini"
+               aria-label="Profile"
+               ng-click="$mdOpenMenu($event)">
+      <i class="fa fa-user"></i>
+    </md-button>
+    <md-menu-content width="4">
+      <md-menu-item>
+        <md-button ng-click="navCtrl.redirectProfile()">
+          Profile
+        </md-button>
+      </md-menu-item>
+      <md-menu-item>
+        <md-button ng-click="navCtrl.redirectSignOut()">
+          Sign Out
+        </md-button>
+      </md-menu-item>
+    </md-menu-content>
+    </md-menu>
 </md-toolbar>
 <div id="sidebarContainer" layout="row" flex>
   <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-4dp" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')">

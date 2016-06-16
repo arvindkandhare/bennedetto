@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from uuid import uuid4
 from decimal import Decimal
 import datetime
@@ -20,6 +22,11 @@ class TotalByMixin(object):
         expr = models.Sum(self.total_by)
         key = '{}__sum'.format(self.total_by)
         return self.aggregate(expr)[key] or 0
+
+    def total_expense(self):
+        expr = models.Sum(self.total_by)
+        key = '{}__sum'.format(self.total_by)
+        return self.filter(amount__lt=0).aggregate(expr)[key] or 0
 
 
 class UserMixin(object):
@@ -58,13 +65,16 @@ class Rate(models.Model):
         return '{0} ({1})'.format(self.description,
                                   self.amount_per_day)
 
+    class Meta:
+        ordering = ('-amount_per_day', )
+
 
 class TransactionQuerySet(models.QuerySet, TotalByMixin, UserMixin):
     total_by = 'amount'
 
     def _days_from_today(self, days):
         end = timezone.now()
-        start = end - datetime.timedelta(days=days)
+        start = end - timezone.timedelta(days=days)
         return self.date_range(start, end)
 
     def date(self, date):
@@ -73,7 +83,7 @@ class TransactionQuerySet(models.QuerySet, TotalByMixin, UserMixin):
                            timestamp__year=date.year)
 
     def today(self):
-        return self.date(timezone.now())
+        return self._days_from_today(0)
 
     def last_week(self):
         return self._days_from_today(7)
@@ -84,23 +94,20 @@ class TransactionQuerySet(models.QuerySet, TotalByMixin, UserMixin):
     def last_year(self):
         return self._days_from_today(365)
 
-    def date_range(self, start, end):
-        qs = self
-        zone = timezone.get_current_timezone()
+    def date_range(self, start_of_day, end_of_day):
+        query_set = self
 
-        if start:
-            start = datetime.datetime.combine(start, datetime.time.min)
-            start = zone.localize(start)
-            qs = qs.filter(timestamp__gte=start)
+        if start_of_day:
+            start_of_day = timezone.datetime.combine(start_of_day, datetime.time.min)
+            query_set = query_set.filter(timestamp__gte=start_of_day)
 
-        if end:
-            end = datetime.datetime.combine(end, datetime.time.max)
-            end = zone.localize(end)
-            qs = qs.filter(timestamp__lte=end)
+        if end_of_day:
+            end_of_day = timezone.datetime.combine(end_of_day, datetime.time.max)
+            query_set = query_set.filter(timestamp__lte=end_of_day)
 
-        return qs
+        return query_set
 
-    def create_from_rate_balance(self, user):
+    def create_transaction_from_rate_balance(self, user):
         instance = self.model()
         instance.description = 'Rate Total'
         instance.amount = Rate.objects.user(user).total()
@@ -108,7 +115,7 @@ class TransactionQuerySet(models.QuerySet, TotalByMixin, UserMixin):
         return instance
 
     def bulk_transact_rate_total(self, users):
-        return self.bulk_create([self.create_from_rate_balance(user)
+        return self.bulk_create([self.create_transaction_from_rate_balance(user)
                                  for user in users])
 
 
@@ -128,3 +135,6 @@ class Transaction(models.Model):
     def __unicode__(self):
         return '{0} ({1})'.format(self.description,
                                   self.amount)
+
+    class Meta:
+        ordering = ('-timestamp', )

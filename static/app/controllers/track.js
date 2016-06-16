@@ -1,21 +1,37 @@
 (function() {
     'use strict';
 
-    function TrackController($scope, $mdSidenav, TransactionsResource, RatesResource) {
+    function TrackController($scope, $mdSidenav, TransactionsResource, RatesResource, DateTimeService) {
         var self = this,
 
             getEmptyTransaction = function() {
                 return {
-                    timestamp: new Date()
+                    timestamp: DateTimeService.now()
                 };
             },
 
             getEmptyRate = function() {
                 return {};
+            },
+
+            getFilters = function() {
+                if (self.toDate || self.fromDate) {
+                    return {
+                        toDate: self.toDate,
+                        fromDate: self.fromDate
+                    };
+                } else {
+                    return undefined;
+                }
             };
+
+        self.positiveTrans = false;
+        self.positiveRate = false;
 
         self.newTransaction = getEmptyTransaction();
         self.newRate = getEmptyRate();
+        self.fromDate = DateTimeService.now();
+        self.toDate = DateTimeService.now();
 
         self.reloadTransactions = function(filters) {
             TransactionsResource.query(filters).$promise.then(function(data) {
@@ -40,6 +56,10 @@
         self.submitTransaction = function() {
             var promise;
 
+            if (!self.positiveTrans) {
+                self.newTransaction.amount = self.newTransaction.amount * -1;
+            }
+
             if (self.newTransaction.id) {
                 promise = TransactionsResource.update(self.newTransaction).$promise;
             } else {
@@ -48,13 +68,17 @@
 
             promise.then(function() {
                 self.toggleTransactionForm();
-                self.reloadTransactions();
+                self.reloadTransactions(getFilters());
                 self.summaryTable.reload();
             });
         };
 
         self.submitRate = function() {
             var promise;
+
+            if (!self.positiveRate) {
+                self.newRate.amount = self.newRate.amount * -1;
+            }
 
             if (self.newRate.id) {
                 promise = RatesResource.update(self.newRate).$promise;
@@ -82,7 +106,7 @@
 
         self.deleteTransaction = function(res) {
             TransactionsResource.delete(res).$promise.then(function(){
-                self.reloadTransactions();
+                self.reloadTransactions(getFilters());
                 self.summaryTable.reload();
             });
         };
@@ -92,10 +116,13 @@
         };
 
         self.editTransaction = function(res) {
+            var amount = Number(res.amount);
+            self.positiveTrans = (amount > 0);
+
             self.newTransaction = {
                 id: res.id,
                 description: res.description,
-                amount: Number(res.amount),
+                amount: Math.abs(amount),
                 timestamp: new Date(res.timestamp),
                 user: res.user
             };
@@ -103,10 +130,12 @@
         };
 
         self.editRate = function(res) {
+            var amount = Number(res.amount);
+            self.positiveRate = (amount > 0);
             self.newRate = {
                 id: res.id,
                 description: res.description,
-                amount: Number(res.amount),
+                amount: Math.abs(amount),
                 days: Number(res.days),
                 user: res.user
             };
@@ -118,7 +147,7 @@
             delete self.fromDate;
         };
 
-        self.reloadTransactions();
+        self.reloadTransactions(getFilters());
         self.reloadRates();
 
         $scope.$watch(function() {
@@ -135,5 +164,5 @@
 
     angular
         .module('bennedetto')
-        .controller('TrackController', ['$scope', '$mdSidenav', 'TransactionsResource', 'RatesResource', 'SummaryReport', TrackController]);
+        .controller('TrackController', ['$scope', '$mdSidenav', 'TransactionsResource', 'RatesResource', 'DateTimeService', TrackController]);
 }());

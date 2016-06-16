@@ -4,9 +4,6 @@ THIS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.join(THIS_DIR, '..')
 
 INSTALLED_APPS = (
-    # 3rd party admin apps
-    'flat',
-
     # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -53,7 +50,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 # custom
-                'bennedetto.processors.constants'
+                'bennedetto.processors.constants',
+                'bennedetto.processors.timestamp'
             ],
         },
     },
@@ -72,12 +70,14 @@ API_URL = '/api/'
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'prod_static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'temp/static')  # we'll override this in prod.py
+
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
 AUTH_USER_MODEL = 'authenticating.User'
+LOGIN_REDIRECT_URL = '/'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (

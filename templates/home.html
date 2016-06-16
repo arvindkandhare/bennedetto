@@ -9,17 +9,24 @@
 <script type="text/javascript" src="{% static 'app/app.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/services/static.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/services/resource.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/services/color.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/services/datetime.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/directives/bd-navbar.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/directives/bd-summary-table.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/directives/bd-rates-pie.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/controllers/track.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/controllers/explore.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/controllers/profile.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/controllers/family.js' %}"></script>
 {% endblock %}
 {% block scripts_inline %}
 <script type="text/javascript">
  angular.module('bennedetto').constant('APP_SETTINGS', {
      apiUrl: '{{ API_URL }}',
      staticUrl: '{{ STATIC_URL }}',
-     version: '{{ VERSION }}'
+     logoutUrl: '{% url 'logout' %}',
+     version: '{{ VERSION }}',
+     email: '{{ request.user.email }}'
  });
 </script>
 {% endblock %}

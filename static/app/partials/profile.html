@@ -1,0 +1,99 @@
+<div class="container-fluid">
+  <div class="page-header">
+    <h2 class="lead">Profile</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6" ng-show="!ctrl.user.verified">
+      <div class="panel panel-default">
+        <div class="panel-heading">Verify your email</div>
+        <div class="panel-body">
+          <p>You should verify your email.
+            Otherwise, it won't be possible to reset
+            your password.</p>
+        </div>
+        <div class="panel-footer text-right" ng-show="!ctrl.emailSent">
+          <button class="btn btn-success" ng-click="ctrl.verify()">Send an email to {{ ctrl.user.email }}</button>
+        </div>
+        <div class="panel-footer text-right" ng-show="ctrl.emailSent">
+          <button class="btn btn-success" ng-disabled="true">Email Sent</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">Change Password</div>
+        <div class="panel-body">
+          <div class="alert alert-danger" ng-show="ctrl.error" ng-bind="ctrl.error"></div>
+          <div class="alert alert-success" ng-show="ctrl.success" ng-bind="ctrl.success"></div>
+          <md-input-container>
+            <label>Old Password</label>
+            <input type="password" ng-model="ctrl.passwordChange.old" />
+          </md-input-container>
+          <md-input-container>
+            <label>New Password</label>
+            <input type="password" ng-model="ctrl.passwordChange.new1" />
+          </md-input-container>
+          <md-input-container>
+            <label>Confirm</label>
+            <input type="password" ng-model="ctrl.passwordChange.new2" />
+          </md-input-container>
+        </div>
+        <div class="panel-footer text-right">
+          <button class="btn btn-default" ng-click="ctrl.newPasswordForm()">Clear</button>
+          <button class="btn btn-success" ng-click="ctrl.changePasswordClick()" ng-disabled="!ctrl.valid">Submit</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6" ng-show="!ctrl.user.membership">
+      <div class="panel panel-default">
+	<div class="panel-heading">Family</div>
+	<div class="panel-body">
+	  <p>
+	    Create a family account by inviting other users to join.
+	    They'll be able to view and edit the same transactions.
+	  </p>
+	  <div class="input-group">
+	    <input ng-model="ctrl.familyName" class="form-control" type="text" placeholder="Family Name"/>
+	    <span class="input-group-btn">
+	      <button class="btn btn-success" type="button" ng-click="ctrl.createFamily()">Create Family</button>
+	    </span>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="col-md-6" ng-show="ctrl.user.membership">
+      <div class="panel panel-default">
+	<div class="panel-heading" ng-bind="ctrl.user.membership.family_name"></div>
+	<div class="panel-body">
+	  <div ng-show="ctrl.user.membership.admin">
+	    <p>
+	      Invite users by email to your family.
+	    </p>
+	    <div class="input-group">
+	      <div class="input-group">
+		<input type="email" class="form-control" placeholder="Email" ng-model="ctrl.newMemberEmail">
+		<span class="input-group-btn">
+		  <button class="btn btn-default" type="button" ng-click="ctrl.sendInvitation()">Send Invitation</button>
+		</span>
+	      </div>
+	    </div>
+	  </div>
+
+	  <table class="table">
+	    <tr>
+	      <th>Email</th>
+	      <th>Verified</th>
+	      <th>Admin</th>
+	    </tr>
+	    <tr ng-repeat="member in ctrl.members">
+	      <td ng-bind="member.email"></td>
+	      <td ng-bind="member.verified"></td>
+	      <td ng-bind="member.admin"></td>
+	    </tr>
+	  </table>
+	  
+	</div>
+      </div>
+    </div>
+  </div>
+</div>

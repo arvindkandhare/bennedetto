@@ -1,3 +1,16 @@
+bd-navbar md-toolbar .md-toolbar-tools,
+bd-navbar md-toolbar md-menu .md-mini,
+#sitebar md-menu {
+    background-color: #008080;
+    height: 90px;
+    max-height: 90px;
+}
+
+.md-button {
+  margin-top: -10px;
+}
+
+
 .md-datepicker-calendar {
     background-color: white;
 }
@@ -16,10 +29,6 @@ md-sidenav.md-locked-open {
 
 #sidebarContainer {
     height: 100%;
-}
-
-bd-navbar md-toolbar .md-toolbar-tools {
-    background-color: #008080;
 }
 
 bd-navbar md-toolbar small {
@@ -55,4 +64,8 @@ bd-navbar md-toolbar small {
 
 .panel button {
     margin-left: 20px;
+}
+
+.summary-expense {
+  color: #A81839;
 }

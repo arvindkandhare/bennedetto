@@ -72,7 +72,7 @@
       <table class="table">
         <thead>
           <th>Description</th>
-          <th>Amount</th>
+          <th>Amount / Day</th>
           <th>Action</th>
         </thead>
         <tbody>
@@ -102,6 +102,12 @@
         </tbody>
       </table>
     </div>
+    <div class="col-md-6">
+      <div class="page-header">
+        <h2 class="lead">Rates Breakdown</h2>
+      </div>
+      <bd-rates-pie rates="ctrl.rates"></bd-rates-pie>
+    </div>
   </div>
 </div>
 <md-sidenav class="md-sidenav-right md-whiteframe-z2" md-component-id="transaction">
@@ -126,6 +132,10 @@
           </div>
         </md-input-container>
       </div>
+      <md-switch ng-model="ctrl.positiveTrans" aria-label="positive">
+        <span ng-show="ctrl.positiveTrans === false">negative</span>
+        <span ng-show="ctrl.positiveTrans === true">positive</span>
+      </md-switch>
       <div class="form-group">
         <md-input-container>
           <label>Amount</label>
@@ -168,6 +178,10 @@
           <p ng-message="required">Description is required</p>
         </div>
       </md-input-container>
+      <md-switch ng-model="ctrl.positiveRate" aria-label="positive">
+        <span ng-show="ctrl.positiveRate === false">negative</span>
+        <span ng-show="ctrl.positiveRate === true">positive</span>
+      </md-switch>
       <md-input-container>
         <label>Amount</label>
         <input type="number"
